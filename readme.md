@@ -1,4 +1,4 @@
-## **Laravel School Management System** 
+<!--## **Laravel School Management System** 
 
 **LAVSMS** is developed for educational institutions like schools and colleges built on Laravel 8
 
@@ -120,4 +120,4 @@ If you discover a security vulnerability within LAV_SMS, please send an e-mail t
 - Library Resources/Study Materials Upload for Students
 
 ### **Contact [CJ INSPIRED]**
-- Phone : +2347068149559
+- Phone : +2347068149559-->
