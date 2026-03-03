@@ -44,23 +44,4 @@ console.log('Hello from app.js');
 //     encrypted: true,
 // });
 
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
-
-window.Pusher = Pusher;
-
-window.Echo = new Echo({
-    broadcaster: "pusher",
-    key: "f9e3c241ba45fcba1f84",
-    cluster: "ap2",
-    forceTLS: true,
-});
-
-// Use the ACTUAL channel name from your MessageSent.php event
-// If you are using a PrivateChannel in PHP, use .private() here
-window.Echo.private("chat." + window.userId).listen("MessageSent", (e) => {
-    console.log("New message received:", e);
-    // Your logic to append the message to the UI goes here
-    $("#message-container").append("<div>" + e.message.message + "</div>");
-});
 

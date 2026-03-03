@@ -145,8 +145,8 @@ $(document).ready(function() {
     window.Pusher = Pusher;
     window.Echo = new Echo({
         broadcaster: 'pusher',
-        key: 'f9e3c241ba45fcba1f84',
-        cluster: 'ap2',
+        key: 'yourkey',
+        cluster: '',
         forceTLS: true,
         // Since this is Laravel 8, we need to point to the auth endpoint
         authEndpoint: '/broadcasting/auth',
