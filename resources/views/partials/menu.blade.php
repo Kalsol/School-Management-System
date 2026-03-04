@@ -48,7 +48,7 @@
 
                 {{-- The rest of your menu items remain the same --}}
                 @if(Qs::userIsTeamSA())
-                    <li class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['attendance.index', 'attendance.report']) ? 'nav-item-expanded nav-item-open' : '' }} ">
+                    <li class="nav-item nav-item-submenu {{ in_array(Route::currentRouteName(), ['attendance.index', 'attendance.student_report','attendance.teacher_report']) ? 'nav-item-expanded nav-item-open' : '' }} ">
                         <a href="#" class="nav-link"><i class="icon-alarm"></i> <span> Attendance</span></a>
                         <ul class="nav nav-group-sub">
                             <li class="nav-item"><a href="{{ route('attendance.index') }}" class="nav-link {{ Route::is('attendance.index') ? 'active' : '' }}">Start Scanning</a></li>

@@ -29,7 +29,7 @@
         </ul>
 			<span class="navbar-text ml-md-3 mr-md-auto"></span>
         <ul class="navbar-nav">
-            <li class="nav-item">
+            <!--<li class="nav-item">
                 <a href="#" class="navbar-nav-link">
                     <i class="icon-bubbles4"></i>
                     <span class="d-md-none ml-2">Messages</span>
@@ -51,7 +51,7 @@
                         <p class="text-center py-3 text-muted">No new announcements</p>
                     </div>
                 </div>
-            </li>
+            </li>-->
             <li class="nav-item dropdown dropdown-user">
                 <a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
                     <img style="width: 38px; height:38px;" src="{{ Auth::user()->photo }}" class="rounded-circle" alt="photo">
