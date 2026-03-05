@@ -46,48 +46,47 @@ class UsersTableSeeder extends Seeder
         DB::table('users')->insert($d);
     }
 
-    protected function createManyUsers(int $count)
+    protected function createManyUsers()
     {
         $data = [];
         $password = Hash::make('password');
         
-        $firstNames = ['Abebe', 'Almaz', 'Bekele', 'Chala', 'Dawit', 'Eden', 'Fasil', 'Genet', 'Hanna', 'Ismael', 'Jember', 'Kassa', 'Luel', 'Marta', 'Nardos', 'Omar', 'Pawlos', 'Ruth', 'Samuel', 'Tadesse'];
-        $lastNames = ['Kebede', 'Tekle', 'Mamo', 'Girma', 'Wolde', 'Tesfaye', 'Bekele', 'Aberra', 'Tessema', 'Desta'];
+        // The specific list of teachers
+        $teacherNames = [
+            'Mr. Chala', 'Mr. Gurmecha', 'Mr. Tadele', 'Mr. Kumela', 
+            'Mr. Muhammed', 'Mr. Tekalegn', 'Mr. Aschalew', 'Mr. Getu', 
+            'Mr. Tadesse', 'Mrs. Weyneshet', 'Mr. Abdulmelik', 'Mr. Asnake', 
+            'Mr. Fitsum', 'Mr. Amare', 'Mr. Jeylan', 'Mr. Kabede', 'Mr. Maserat'
+        ];
     
-        $types = ['teacher', 'parent'];
+        foreach ($teacherNames as $originalName) {
+            // 1. Remove "Mr. " or "Mrs. " (case insensitive)
+            $cleanName = preg_replace('/^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $originalName);
+            
+            // 2. Create a clean username (e.g., "teacher_chala")
+            // Str::slug converts "Weyneshet" to "weyneshet" and handles spaces if they exist
+            $username = 'teacher_' . Str::slug($cleanName, '_');
     
-        foreach ($types as $type) {
-            for ($i = 1; $i <= $count; $i++) {
-                $fName = $firstNames[array_rand($firstNames)];
-                $lName = $lastNames[array_rand($lastNames)];
-                
-                // Format name: "Abebe Kebede (Teacher 1)"
-                $fullName = $fName . ' ' . $lName . ' (' . ucfirst($type) . ' ' . $i . ')';
-                
-                // Unique Username: "teacher_abebe_1"
-                // This guarantees uniqueness even if the random name is picked again
-                $username = strtolower($type . '_' . $fName . '_' . $i);
-                
-                $data[] = [
-                    'name' => $fullName,
-                    'email' => $username . '@sms.com',
-                    'user_type' => $type,
-                    'username' => $username,
-                    'password' => $password,
-                    'code' => strtoupper(Str::random(10)),
-                    'remember_token' => Str::random(10),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+            $data[] = [
+                'name'           => $cleanName, // Storing name without title
+                'email'          => $username . '@sms.com',
+                'user_type'      => 'teacher',
+                'username'       => $username,
+                'password'       => $password,
+                'code'           => strtoupper(Str::random(10)),
+                'remember_token' => Str::random(10),
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ];
     
-                // Insert in chunks to keep it clean
-                if (count($data) >= 50) {
-                    DB::table('users')->insert($data);
-                    $data = [];
-                }
+            // Optional: Insert in chunks if the list grows very large
+            if (count($data) >= 50) {
+                DB::table('users')->insert($data);
+                $data = [];
             }
         }
     
+        // Insert remaining records
         if (!empty($data)) {
             DB::table('users')->insert($data);
         }
