@@ -1,9 +1,7 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\MyClass;
-use App\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -12,62 +10,70 @@ class SubjectsTableSeeder extends Seeder
 {
     public function run()
     {
+        // Clear the table to start fresh
         DB::table('subjects')->delete();
 
-        // 1. Get all available teachers
-        $teachers = User::where('user_type', 'teacher')->get();
-        
-        if ($teachers->isEmpty()) {
-            $this->command->error("No teachers found! Please run UsersTableSeeder first.");
-            return;
-        }
+        // Map full names to your specific shorthand codes
+        $slugMap = [
+            'Afaan Oromo'   => 'A/O',
+            'Biology'       => 'BIO',
+            'English'       => 'ENG',
+            'Maths'         => 'MATH',
+            'Chemistry'     => 'CHEM',
+            'Geography'     => 'GEO',
+            'History'       => 'HIST',
+            'Citizenship'   => 'CITEDU',
+            'HPE'           => 'HPE',
+            'Economics'     => 'ECO',
+            'Amharic'       => 'AMH',
+            'IT'            => 'IT',
+            'Chinese'       => 'CHN',
+            'Physics'       => 'PHY',
+            'ICT'           => 'ICT',
+            'Arabic'        => 'AR',
+        ];
 
         $my_classes = MyClass::all();
-        
-        // We use a counter to cycle through teachers so they get a fair distribution
-        $teacherIndex = 0;
-        $teacherCount = $teachers->count();
 
         foreach ($my_classes as $my_class) {
-            $subjects = $this->getSubjectsByClassName($my_class->name);
+            // Get the list of subjects allowed for this grade
+            $allowedSubjects = $this->getSubjectsByClassName($my_class->name);
             
             $insertData = [];
-            foreach ($subjects as $subjectName) {
-                // 2. Assign the current teacher in the loop
-                $assignedTeacher = $teachers[$teacherIndex];
+            $className = strtoupper($my_class->name); // e.g., "9A"
+
+            foreach ($allowedSubjects as $subjectName) {
+                // Get shorthand from our map, default to Slug if missing
+                $shortCode = $slugMap[$subjectName] ?? Str::slug($subjectName);
 
                 $insertData[] = [
                     'name'        => $subjectName,
-                    'slug'        => Str::slug($my_class->name . '-' . $subjectName),
+                    'slug'        => $shortCode,
                     'my_class_id' => $my_class->id,
-                    'teacher_id'  => $assignedTeacher->id, // Assigns a different teacher
+                    'teacher_id'  => null, // Assign via GUI later
                     'created_at'  => now(),
                     'updated_at'  => now(),
                 ];
-
-                // 3. Move to the next teacher for the next subject
-                // If we reach the end of the 50 teachers, start back at 0
-                $teacherIndex = ($teacherIndex + 1) % $teacherCount;
             }
 
             if (!empty($insertData)) {
                 DB::table('subjects')->insert($insertData);
             }
         }
-        
-        $this->command->info("Subjects seeded and distributed among " . $teacherCount . " teachers.");
+
+        $this->command->info("Seeded subjects for Grade 9 & 10 with shorthand slugs.");
     }
 
     protected function getSubjectsByClassName($className)
     {
         return match (true) {
             str_contains($className, '9') || str_contains($className, '10') => 
-                ['Amharic', 'Biology', 'Chemistry', 'Civics and Ethical Education', 'English', 'Mathematics', 'Mother Tongue', 'Physical Education', 'Physics', 'Geography', 'History', 'Information Technology'],
-                
-                str_contains($className, '11') || str_contains($className, '12') => 
-                ['Biology', 'Chemistry', 'Physics', 'Technical Drawing', 'English', 'Civics', 'Physical Education', 'Mathematics', 'Information Technology'],
-                
-                default => [],
+                [
+                    'English', 'Maths', 'Physics', 'Chemistry', 'Biology', 
+                    'Geography', 'History', 'Citizenship', 'Economics', 'IT', 
+                    'Afaan Oromo', 'Amharic', 'HPE', 'Chinese', 'ICT', 'Arabic'
+                ],
+            default => [],
         };
     }
 }

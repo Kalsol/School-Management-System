@@ -14,19 +14,20 @@ class UsersTableSeeder extends Seeder
     {
         DB::table('users')->delete();
 
-        $this->createNewUsers();
-        // Calling this to generate 50 teachers and 50 parents
-        $this->createManyUsers(25);
+        // Calling this to generate user for each user type
+        $this->createAdminUsers();
+        $this->createTeacherUsers();
+        $this->createParentUsers();
     }
-
-    protected function createNewUsers()
+    
+    protected function createAdminUsers()
     {
         $password = Hash::make('password');
 
         $d = [
             [
                 'name' => 'Kaleab Solomon',
-                'email' => 'superadmin@sms.com',
+                'email' => 'superadmin@arsi.edu.et',
                 'username' => 'kaleab',
                 'password' => $password,
                 'user_type' => 'super_admin',
@@ -35,7 +36,7 @@ class UsersTableSeeder extends Seeder
             ],
             [
                 'name' => 'Admin',
-                'email' => 'admin@sms.com',
+                'email' => 'admin@arsi.edu.et',
                 'password' => $password,
                 'user_type' => 'admin',
                 'username' => 'admin',
@@ -46,35 +47,83 @@ class UsersTableSeeder extends Seeder
         DB::table('users')->insert($d);
     }
 
-    protected function createManyUsers()
+    public function createTeacherUsers()
     {
-        $data = [];
-        $password = Hash::make('password');
-        
-        // The specific list of teachers
-        $teacherNames = [
-            'Mr. Chala', 'Mr. Gurmecha', 'Mr. Tadele', 'Mr. Kumela', 
-            'Mr. Muhammed', 'Mr. Tekalegn', 'Mr. Aschalew', 'Mr. Getu', 
-            'Mr. Tadesse', 'Mrs. Weyneshet', 'Mr. Abdulmelik', 'Mr. Asnake', 
-            'Mr. Fitsum', 'Mr. Amare', 'Mr. Jeylan', 'Mr. Kabede', 'Mr. Maserat'
+        $password = Hash::make('teacher');
+        // Extracted directly from your image
+        $teachers = [
+            ['name' => 'Mr. Chala'],
+            ['name' => 'Mr. Gurmecha B.'],
+            ['name' => 'Mr. Tadele W.'],
+            ['name' => 'Mr. Kumela R.'],
+            ['name' => 'Mr. Muhammed H.'],
+            ['name' => 'Mr. Mohamed A.'],
+            ['name' => 'Mr. Tekalegn A.'],
+            ['name' => 'Mr. Aschalew D.'],
+            ['name' => 'Mr. Getu Al.'],
+            ['name' => 'Mr. Tadesse Z.'],
+            ['name' => 'Mrs. Weyneshet G.'],
+            ['name' => 'Mr. Abdulmelik'],
+            ['name' => 'Mr. Fitsum'],
+            ['name' => 'Mr. Asnake S.'],
+            ['name' => 'Mr. Amare Girma'],
+            ['name' => 'Mr. Jeylan H.'],
+            ['name' => 'Mr. Kabede'],
+            ['name' => 'Mr. Maserat'],
         ];
-    
-        foreach ($teacherNames as $originalName) {
-            // 1. Remove "Mr. " or "Mrs. " (case insensitive)
-            $cleanName = preg_replace('/^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $originalName);
-            
-            // 2. Create a clean username (e.g., "teacher_chala")
-            // Str::slug converts "Weyneshet" to "weyneshet" and handles spaces if they exist
-            $username = 'teacher_' . Str::slug($cleanName, '_');
-    
+
+        $data = [];
+
+        foreach ($teachers as $teacher) {
+            // Remove Mr./Mrs. and trailing initials/dots
+            $cleanName = preg_replace('/^(Mr\.|Mrs\.|Ms\.|Dr\.)\s+/i', '', $teacher['name']);
+            $cleanName = rtrim($cleanName, '. '); // Removes trailing dots like in "Tadele W."
+
+            // Generate Username: e.g., "chala123"
+            $username = Str::slug($cleanName, rand(100, 999));
+        
             $data[] = [
-                'name'           => $cleanName, // Storing name without title
-                'email'          => $username . '@sms.com',
+                'name'           => $teacher['name'],
+                'email'          => $username . '@arsi.edu.et',
                 'user_type'      => 'teacher',
                 'username'       => $username,
                 'password'       => $password,
                 'code'           => strtoupper(Str::random(10)),
                 'remember_token' => Str::random(10),
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ];
+        }
+
+        DB::table('users')->insert($data);
+    }
+    
+    protected function createParentUsers()
+    {
+        $data = [];
+        $password = Hash::make('parent');
+    
+        $parentNames = [
+            'Abebe Kebede', 'Mulugeta Tesfaye', 'Zewdu Tekle', 'Belaynesh Amare',
+            'Tewodros Kassahun', 'Genet Assefa', 'Yohannes Haile', 'Saba Gebremariam',
+            'Desta Alemu', 'Kifle Woldemariam', 'Hiwot Tadesse', 'Mesfin Hagos',
+            'Almaz Ayana', 'Birhanu Jula', 'Rahel Getachew', 'Solomon Bogale',
+            'Martha Wegayehu', 'Samuel Bekele', 'Eskinder Nega', 'Tigist Assefa'
+        ];
+    
+        foreach ($parentNames as $originalName) {
+
+            // Create a clean username (e.g., "parent_chala")
+            $username = 'parent_' . Str::slug($originalName, '_');
+    
+            $data[] = [
+                'name'           => $originalName, // Storing name without title
+                'email'          => $username . '@arsi.edu.et',
+                'user_type'      => 'parent',
+                'username'       => $username,
+                'password'       => $password,
+                'code'           => strtoupper(Str::random(10)),
+                'remember_token' => null,
                 'created_at'     => now(),
                 'updated_at'     => now(),
             ];
