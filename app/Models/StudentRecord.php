@@ -16,8 +16,6 @@ class StudentRecord extends Eloquent
         'my_class_id',
         'section_id',
         'my_parent_id',
-        'dorm_id',
-        'dorm_room_no',
         'adm_no',
         'year_admitted',
         'wd',
@@ -46,10 +44,5 @@ class StudentRecord extends Eloquent
     public function section()
     {
         return $this->belongsTo(Section::class);
-    }
-
-    public function dorm()
-    {
-        return $this->belongsTo(Dorm::class);
     }
 }

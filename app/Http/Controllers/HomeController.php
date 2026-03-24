@@ -52,7 +52,6 @@ class HomeController extends Controller
             $d['users'] = $this->user->getAll();
         }
         
-        
         $notices = $this->notice->allExceptAuth()->sortBy("id", SORT_REGULAR, true);
         // Count all users who did not view notice(s) - whose id not in viewers_ids.
         foreach ($notices as $ntc) {

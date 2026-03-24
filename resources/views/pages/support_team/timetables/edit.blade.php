@@ -22,7 +22,7 @@
                     <div class="form-group row">
                         <label for="my_class_id" class="col-lg-3 col-form-label font-weight-semibold">Class <span class="text-danger">*</span></label>
                         <div class="col-lg-9">
-                            <select required data-placeholder="Select Class" class="form-control select" name="my_class_id" id="my_class_id">
+                            <select onchange="getClassData(this.value)"  required data-placeholder="Select Class" class="form-control select" name="my_class_id" id="my_class_id">
                                 @foreach($my_classes as $mc)
                                     <option {{ $ttr->my_class_id == $mc->id ? 'selected' : '' }} value="{{ $mc->id }}">{{ $mc->name }}</option>
                                 @endforeach
@@ -31,17 +31,23 @@
                     </div>
 
                     <div class="form-group row">
-                        <label for="exam_id" class="col-lg-3 col-form-label font-weight-semibold">Type (Class or Exam)</label>
+                        <label for="section_id" class="col-lg-3 col-form-label font-weight-semibold">Section <span class="text-danger">*</span></label>
                         <div class="col-lg-9">
-                            <select class="select form-control" name="exam_id" id="exam_id">
-                                <option value="">Class Timetable</option>
-                                @foreach($exams as $ex)
-                                    <option {{ $ttr->exam_id == $ex->id ? 'selected' : '' }} value="{{ $ex->id }}">{{ $ex->name }}</option>
-                                @endforeach
+                            <select required data-placeholder="Select Section" class="form-control select" name="section_id" id="section_id">
                             </select>
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <label for="exam_id" class="col-lg-3 col-form-label font-weight-semibold">Type (Class)</label>
+                        <div class="col-lg-9">
+                            <select class="select form-control" name="exam_id" id="exam_id">
+                                <option value=""> Class Timetable </option>
+                                <option value="1"> Mid Exam </option>
+                                <option value="2"> Final Exam </option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="text-right">
                         <button id="ajax-btn" type="submit" class="btn btn-primary">Submit form <i class="icon-paperplane ml-2"></i></button>

@@ -174,40 +174,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!--<div class="row">
-                        <div class="col-md-3">
-                            <label for="dorm_id">Dormitory: </label>
-                            <select data-placeholder="Choose..."  name="dorm_id" id="dorm_id" class="select-search form-control">
-                                <option value=""></option>
-                                @foreach($dorms as $d)
-                                    <option {{ (old('dorm_id') == $d->id) ? 'selected' : '' }} value="{{ $d->id }}">{{ $d->name }}</option>
-                                    @endforeach
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Dormitory Room No:</label>
-                                <input type="text" name="dorm_room_no" placeholder="Dormitory Room No" class="form-control" value="{{ old('dorm_room_no') }}">
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Sport House:</label>
-                                <input type="text" name="house" placeholder="Sport House" class="form-control" value="{{ old('house') }}">
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Admission Number:</label>
-                                <input type="text" name="adm_no" placeholder="Admission Number" class="form-control" value="{{ old('adm_no') }}">
-                            </div>
-                        </div>
-                    </div>-->
                 </fieldset>
             </form>
         </div>
