@@ -14,8 +14,7 @@ BASE_URL = "http://127.0.0.1:8000"
 STREAM_URL = f"http://{PHONE_IP}:8080/video"
 # Path to the 'public' folder where student subfolders exist
 FACES_DIR = (
-    r"C:\Users\Tati\Desktop\Software Development\lav_sms\storage\app\public\uploads\student"
-    
+    r"C:\Users\Tati\Desktop\Software Development\lav_sms\storage\app\public\uploads\student"  
 )
 
 # Generate the session ID for today

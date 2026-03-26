@@ -75,12 +75,16 @@ class MarkController extends Controller
             return $this->noStudentRecord();
         }
 
+
+
         $wh = ['student_id' => $student_id, 'year' => $year ];
         $d['marks'] = $this->exam->getMark($wh);
         $d['exam_records'] = $exr = $this->exam->getRecord($wh);
         $d['exams'] = $this->exam->getExam(['year' => $year]);
         $d['sr'] = $this->student->getRecord(['user_id' => $student_id])->first();
         $d['my_class'] = $mc = $this->my_class->getMC(['id' => $exr->first()->my_class_id])->first();
+        
+        // $d['section'] = $this->my_class->findSection();
         $d['class_type'] = $this->my_class->findTypeByClass($mc->id);
         $d['subjects'] = $this->my_class->findSubjectByClass($mc->id);
         $d['year'] = $year;
@@ -88,7 +92,7 @@ class MarkController extends Controller
         $d['skills'] = $this->exam->getSkillByClassType() ?: NULL;
         //$d['ct'] = $d['class_type']->code;
         //$d['mark_type'] = Qs::getMarkType($d['ct']);
-
+        // dd($d);
         return view('pages.support_team.marks.show.index', $d);
     }
 
