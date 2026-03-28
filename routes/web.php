@@ -200,55 +200,59 @@ Route::group(['middleware' => ['auth','checkForPasswordUpdate',]], function () {
         // Route::get('bulk-summary', [AssessmentController::class, 'bulkSummary'])->name('ajax.bulk-summary');
     });
 
-});
 
-/************************ SUPER ADMIN ****************************/
-Route::group(['namespace' => 'SuperAdmin','middleware' => 'super_admin', 'prefix' => 'super_admin'], function(){
-    Route::get('/settings', 'SettingController@index')->name('settings');
-    Route::put('/settings', 'SettingController@update')->name('settings.update');
-    Route::get('/', 'SystemController@index')->name('admin.system.index');
-    Route::post('/run-command', 'SystemController@runCommand')->name('admin.system.run');
-    Route::get('/download/{file}', 'SystemController@downloadBackup')->name('admin.system.download');
-    Route::delete('/delete/{file}', 'SystemController@deleteBackup')->name('admin.system.delete');
-});
-
-/*************** Notices *****************/
-Route::group(['prefix' => 'notices'], function () {
-    Route::post('set_viewed', 'NoticeController@set_as_viewed')->name('notices.set_viewed');
-    Route::group(['middleware' => 'teamAdministrative'], function () {
-        Route::get('index', 'NoticeController@index')->name('notices.index');
-        Route::post('store', 'NoticeController@store')->name('notices.store');
-        Route::delete('destroy/{notice}', 'NoticeController@destroy')->name('notices.destroy');
-        Route::get('edit/{notice_id?}', 'NoticeController@edit')->name('notices.edit');
-        Route::post('update/{notice}', 'NoticeController@update_record')->name('notices.update');
+    /************************ SUPER ADMIN ****************************/
+    Route::group(['namespace' => 'SuperAdmin','middleware' => 'super_admin', 'prefix' => 'super_admin'], function(){
+        Route::get('/settings', 'SettingController@index')->name('settings');
+        Route::put('/settings', 'SettingController@update')->name('settings.update');
+        Route::get('/', 'SystemController@index')->name('admin.system.index');
+        Route::post('/run-command', 'SystemController@runCommand')->name('admin.system.run');
+        Route::get('/download/{file}', 'SystemController@downloadBackup')->name('admin.system.download');
+        Route::delete('/delete/{file}', 'SystemController@deleteBackup')->name('admin.system.delete');
     });
+
+
+        /*************** Notices *****************/
+    Route::group(['prefix' => 'notices'], function () {
+        Route::post('set_viewed', 'NoticeController@set_as_viewed')->name('notices.set_viewed');
+        Route::group(['middleware' => 'teamAdministrative'], function () {
+            Route::get('index', 'NoticeController@index')->name('notices.index');
+            Route::post('store', 'NoticeController@store')->name('notices.store');
+            Route::delete('destroy/{notice}', 'NoticeController@destroy')->name('notices.destroy');
+            Route::get('edit/{notice_id?}', 'NoticeController@edit')->name('notices.edit');
+            Route::post('update/{notice}', 'NoticeController@update_record')->name('notices.update');
+        });
+    });
+
+    /*************** Event *****************/
+    Route::group(['middleware' => 'auth'], function() {
+        // Schedule routes
+        Route::get('schedule', [EventController::class, 'index'])->name('schedule.index');
+        Route::post('schedule/create-event', [EventController::class, 'create_event'])->name('schedule.create-event');
+        Route::get('schedule/edit-event/{event_id}', [EventController::class, 'edit_event'])->name('schedule.edit-event');
+        Route::post('schedule/update-event/{event_id}', [EventController::class, 'update_event'])->name('schedule.update-event');
+        Route::post('schedule/delete-event', [EventController::class, 'delete_event'])->name('schedule.delete-event');
+    });
+
+    /************************ PARENT ****************************/
+    Route::group(['namespace' => 'MyParent','middleware' => 'my_parent',], function(){
+        Route::get('/my_children', 'MyController@children')->name('my_children');
+    });
+
+    Route::group(['middleware' => 'auth', 'prefix' => 'messages'], function () {
+        Route::get('/', [MessageController::class, 'index'])->name('chat.index');
+        // Route::get('/{id}', [MessageController::class, 'show'])->name('chat.show');
+        Route::post('/send', [MessageController::class, 'sendMessage'])->name('chat.send');
+        Route::post('/announcement', [MessageController::class, 'sendAnnouncement'])->name('announcement.send');
+        
+        // Move this to the BOTTOM of the group and add a 'where' clause
+        Route::get('/view/{id}', [MessageController::class, 'show'])->name('chat.show');
+    });
+
 });
 
-/*************** Event *****************/
-Route::group(['middleware' => 'auth'], function() {
-    // Schedule routes
-    Route::get('schedule', [EventController::class, 'index'])->name('schedule.index');
-    Route::post('schedule/create-event', [EventController::class, 'create_event'])->name('schedule.create-event');
-    Route::get('schedule/edit-event/{event_id}', [EventController::class, 'edit_event'])->name('schedule.edit-event');
-    Route::post('schedule/update-event/{event_id}', [EventController::class, 'update_event'])->name('schedule.update-event');
-    Route::post('schedule/delete-event', [EventController::class, 'delete_event'])->name('schedule.delete-event');
-});
 
 
 
-/************************ PARENT ****************************/
-Route::group(['namespace' => 'MyParent','middleware' => 'my_parent',], function(){
-    Route::get('/my_children', 'MyController@children')->name('my_children');
-});
-
-Route::group(['middleware' => 'auth', 'prefix' => 'messages'], function () {
-    Route::get('/', [MessageController::class, 'index'])->name('chat.index');
-    // Route::get('/{id}', [MessageController::class, 'show'])->name('chat.show');
-    Route::post('/send', [MessageController::class, 'sendMessage'])->name('chat.send');
-    Route::post('/announcement', [MessageController::class, 'sendAnnouncement'])->name('announcement.send');
-    
-    // Move this to the BOTTOM of the group and add a 'where' clause
-    Route::get('/view/{id}', [MessageController::class, 'show'])->name('chat.show');
-});
 
 

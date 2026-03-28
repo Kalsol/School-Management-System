@@ -8,7 +8,7 @@
     <meta id="csrf-token" name="csrf-token" content="{{ csrf_token() }}">
     <meta name="author" content="Yeneta School">
 
-    <title> @yield('page_title') | {{ config('app.name') }} </title>
+    <title> @yield('page_title')</title>
     
     <style>
         /* --- Global Green Theme (#568204) --- */

@@ -21,6 +21,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class AttendanceController extends Controller
 {
+    protected $my_class;
     public function __construct(MyClassRepo $my_class)
     {
         $this->my_class =  $my_class;
@@ -132,7 +133,7 @@ class AttendanceController extends Controller
         $status = ($diff > $gracePeriodMinutes) ? 'Late' : 'Present';
 
         // 4. Save the record
-        TeacherAttendance::create([
+        TeachersAttendance::create([
             'teacher_id' => $teacherId,
             'session_id' => $teacher->session, // The academic year session
             'attendance_date' => $sessionDate,

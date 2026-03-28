@@ -5,7 +5,7 @@
 {{-- Attendance (Student/Parent) --}}
 @if(Qs::userIsStudent() || Qs::userIsParent())
     <li class="nav-item">
-        <a href="{{ route('attendance.my_attendance') }}" class="nav-link {{ Request::is('my-attendance') ? 'active' : '' }}">
+        <a href="{{ route('attendance.my_attendance') }}" class="nav-link {{ in_array(Route::currentRouteName(), ['attendance.my_attendance']) ? 'active' : '' }}">
             <i class="icon-alarm"></i> <span>My Attendance</span>
         </a>
     </li>
