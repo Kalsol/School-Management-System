@@ -43,10 +43,19 @@ class AttendanceController extends Controller
      public function getStudentMap()
      {
          $users = User::whereNotNull('photo')->get(['id', 'photo']);
+        //  dd($users->pluck('photo'));
          $map = $users->mapWithKeys(function ($user) {
-             // This gets 'photo.jpg' from 'http://.../STU123/photo.jpg'
-             return [basename($user->photo) => $user->id];
+     
+             $folder = basename(dirname($user->photo));
+     
+             // ❌ Skip default/shared folders
+             if ($folder === 'images' || empty($folder)) {
+                 return [];
+             }
+     
+             return [$folder => $user->id];
          });
+     
          return response()->json($map);
      }
      
@@ -63,57 +72,49 @@ class AttendanceController extends Controller
     /**
      * API: Mark attendance from Python detection
      */
-    public function markStudentByFace(Request $request)
-    {
-        $studentId = $request->student_id;
-        $sessionDate = $request->session_id; // Date sent from Python (YYYY-MM-DD)
-        $currentTime = now();
-
-        // CONFIG: 8:00 AM Start with 20-minute Grace Period
-        $sessionStartTime = "08:00:00"; 
-        $gracePeriodMinutes = 20;
-
-        // 1. Validate Student exists in academic records
-        $student = StudentRecord::where('user_id', $studentId)->first();
-        if (!$student) {
-            return response()->json(['message' => 'Student record not found'], 404);
-        }
-
-        // 2. Prevent duplicate for the SAME session date
-        $exists = Attendance::where('student_id', $studentId)
-            ->where('attendance_date', $sessionDate)
-            ->exists();
-
-        if ($exists) {
-            return response()->json(['message' => 'Already marked for today'], 200);
-        }
-
-        // 3. Timing Logic (Present vs Late)
-        $startTime = Carbon::createFromFormat('H:i:s', $sessionStartTime);
-        $diff = $startTime->diffInMinutes($currentTime, false);
-
-        // If current time is more than 20 mins past 2:00 PM, mark as Late
-        $status = ($diff > $gracePeriodMinutes) ? 'Late' : 'Present';
-
-        // 4. Save the record
-        Attendance::create([
-            'student_id' => $studentId,
-            'class_id' => $student->my_class_id,
-            'section_id' => $student->section_id,
-            'session_id' => $student->session, // The academic year session
-            'attendance_date' => $sessionDate,
-            'time_in' => $currentTime->toTimeString(),
-            'minutes_late' => ($diff > 0) ? $diff : 0,
-            'status' => $status,
-        ]);
-
-        return response()->json([
-            'message' => "Success: Marked as $status",
-            'status' => $status,
-            'time' => $currentTime->format('h:i A')
-        ], 201);
-    }
-    
+     public function markStudentByFace(Request $request)
+     {
+         $studentId = $request->student_id;
+         $sessionDate = $request->session_id;
+         $currentTime = now();
+     
+         $sessionStartTime = "08:00:00";
+         $gracePeriodMinutes = 20;
+     
+         $student = StudentRecord::where('user_id', $studentId)->first();
+     
+         if (!$student) {
+             return response()->json(['message' => 'Student not found'], 404);
+         }
+     
+         $exists = Attendance::where('student_id', $studentId)
+             ->where('attendance_date', $sessionDate)
+             ->exists();
+     
+         if ($exists) {
+             return response()->json(['message' => 'Already marked'], 200);
+         }
+     
+         $startTime = \Carbon\Carbon::createFromFormat('H:i:s', $sessionStartTime);
+         $diff = $startTime->diffInMinutes($currentTime, false);
+     
+         $status = ($diff > $gracePeriodMinutes) ? 'Late' : 'Present';
+     
+         Attendance::create([
+             'student_id' => $studentId,
+             'class_id' => $student->my_class_id,
+             'section_id' => $student->section_id,
+             'session_id' => $student->session,
+             'attendance_date' => $sessionDate,
+             'time_in' => $currentTime->toTimeString(),
+             'minutes_late' => max(0, $diff),
+             'status' => $status,
+         ]);
+     
+         return response()->json([
+             'message' => "Marked as $status",
+         ], 201);
+     }
     public function markTeacherByFace(Request $request)
     {
         $teacherId = $request->teacher_id;

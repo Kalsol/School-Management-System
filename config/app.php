@@ -146,6 +146,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -213,7 +214,8 @@ return [
         'Mk' => App\Helpers\Mk::class,
         'Pay' => App\Helpers\Pay::class,
         'Evt' => App\Helpers\Evt::class,
-        'Usr' => App\Helpers\Usr::class
+        'Usr' => App\Helpers\Usr::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];
