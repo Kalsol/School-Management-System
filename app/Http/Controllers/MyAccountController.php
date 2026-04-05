@@ -9,6 +9,7 @@ use App\Http\Requests\UserUpdate;
 use App\Repositories\UserRepo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class MyAccountController extends Controller
 {
@@ -44,7 +45,7 @@ class MyAccountController extends Controller
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
             $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type).$code, $f['name']);
-            $d['photo'] = asset('storage/' . $f['path']);
+            $d['photo'] = Storage::url($f['path']);
         }
 
         $this->user->update($user->id, $d);

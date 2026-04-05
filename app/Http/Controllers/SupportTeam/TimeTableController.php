@@ -10,27 +10,33 @@ use App\Models\Setting;
 use App\Repositories\ExamRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\TimeTableRepo;
+use App\Repositories\StudentRepo;
+use App\Repositories\UserRepo;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TimeTableController extends Controller
 {
-    protected $tt, $my_class, $exam, $year;
+    protected $tt, $my_class, $exam, $year, $student, $user;
 
-    public function __construct(TimeTableRepo $tt, MyClassRepo $mc, ExamRepo $exam)
+    public function __construct(TimeTableRepo $tt, MyClassRepo $mc, ExamRepo $exam, StudentRepo $student, UserRepo $user)
     {
         $this->tt = $tt;
         $this->my_class = $mc;
         $this->exam = $exam;
         $this->year = Qs::getCurrentSession();
+        $this->student = $student;
+        $this->user = $user;
     }
 
     public function index()
     {
+        $user = Auth::user();
         $d['exams'] = $this->exam->getExam(['year' => $this->year]);
         $d['my_classes'] = $this->my_class->all();
         $d['tt_records'] = $this->tt->getAllRecords();
-
+        
         return view('pages.support_team.timetables.index', $d);
     }
 

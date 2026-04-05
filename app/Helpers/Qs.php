@@ -76,7 +76,7 @@ class Qs
 
     public static function getTeamAcademic()
     {
-        return ['admin', 'super_admin', 'teacher', 'student'];
+        return ['admin', 'super_admin', 'teacher', 'student', 'parent'];
     }
 
     public static function getTeamAdministrative()
@@ -211,7 +211,7 @@ class Qs
 
     public static function getAllUserTypes($remove=[])
     {
-        $data =  ['super_admin', 'admin', 'teacher', 'accountant', 'librarian', 'student', 'parent'];
+        $data =  ['super_admin', 'admin', 'teacher', 'student', 'parent'];
         return $remove ? array_values(array_diff($data, $remove)) : $data;
     }
 

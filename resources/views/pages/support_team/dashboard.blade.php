@@ -63,51 +63,6 @@
 </div>
 @endif
 
-{{-- TEACHER SPECIFIC VIEW --}}
-@if(Qs::userIsTeacher())
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header header-elements-inline">
-                <h5 class="card-title">Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <a href="{{ route('marks.index') }}" class="text-primary">
-                            <i class="icon-graduation2 icon-2x"></i>
-                            <div class="font-weight-semibold">Enter Marks</div>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="{{ route('attendance.index') }}" class="text-success">
-                            <i class="icon-alarm icon-2x"></i>
-                            <div class="font-weight-semibold">Take Attendance</div>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="{{ route('chat.index') }}" class="text-warning">
-                            <i class="icon-bubbles4 icon-2x"></i>
-                            <div class="font-weight-semibold">Messages</div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-indigo-400 text-white">
-            <div class="card-body">
-                <div class="d-flex">
-                    <h3 class="font-weight-semibold mb-0">My Classes</h3>
-                </div>
-                <div>Currently assigned to {{ $my_classes->count() ?? 0 }} sections</div>
-            </div>
-        </div>
-    </div>
-</div>
-@endif
-
 {{-- 1. PARENT / STUDENT DASHBOARD (TOP SECTION) --}}
 @if(Qs::userIsParent() || Qs::userIsStudent())
 @if(Qs::userIsParent() && isset($firstLoadChild))

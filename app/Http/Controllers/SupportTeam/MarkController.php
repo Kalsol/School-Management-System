@@ -75,8 +75,6 @@ class MarkController extends Controller
             return $this->noStudentRecord();
         }
 
-
-
         $wh = ['student_id' => $student_id, 'year' => $year ];
         $d['marks'] = $this->exam->getMark($wh);
         $d['exam_records'] = $exr = $this->exam->getRecord($wh);

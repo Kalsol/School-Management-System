@@ -70,7 +70,7 @@ class StudentRecordController extends Controller
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
             $f['path'] = $photo->storeAs(Qs::getUploadPath('student').$data['code'], $f['name']);
-            $data['photo'] = asset('storage/' . $f['path']);
+            $data['photo'] = Storage::url($f['path']);
         }
 
         $user = $this->user->create($data); // Create User
@@ -88,6 +88,8 @@ class StudentRecordController extends Controller
         $data['my_class'] = $mc = $this->my_class->getMC(['id' => $class_id])->first();
         $data['students'] = $this->student->findStudentsByClass($class_id);
         $data['sections'] = $this->my_class->getClassSections($class_id);
+        
+        // dd($data['students']);
 
         return is_null($mc) ? Qs::goWithDanger() : view('pages.support_team.students.list', $data);
     }
@@ -152,7 +154,7 @@ class StudentRecordController extends Controller
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
             $f['path'] = $photo->storeAs(Qs::getUploadPath('student').$sr->user->code, $f['name']);
-            $d['photo'] = asset('storage/' . $f['path']);
+            $d['photo'] = Storage::url($f['path']);
         }
 
         $this->user->update($sr->user->id, $d); // Update User Details

@@ -177,7 +177,7 @@ Route::group(['middleware' => ['auth','checkForPasswordUpdate',]], function () {
             Route::get('print/{id}/{exam_id}/{year}', 'MarkController@print_view')->name('marks.print');
         });
         
-        Route::resource('students', 'StudentRecordController');
+        Route::resource('students', 'StudentRecordController')->except(['index']);
         Route::resource('users', 'UserController');
         Route::resource('classes', 'MyClassController');
         Route::resource('sections', 'SectionController');

@@ -28,8 +28,6 @@
 There are 7 types of user accounts. They include:
  
 Administrators (Super Admin & Admin)
-- Librarian
-- Accountant
 - Teacher
 - Student
 - Parent
@@ -49,12 +47,11 @@ After seeding. Login details as follows:
 
 | Account Type  | Username | Email | Password |
 | ------------- | -------- | ----- | -------- |
-| Super Admin | cj | cj@cj.com | cj |
-|  Admin | admin | admin@admin.com | cj |
-|  Teacher | teacher | teacher@teacher.com | cj |
-|  Parent | parent | parent@parent.com | cj |
-|  Accountant | accountant | accountant@accountant.com | cj |
-|  Student | student | student@student.com | cj |
+|  Super Admin | kaleab | superadmin@arsi.edu.et | password |
+|  Admin | admin | admin@arsi.edu.et | password |
+|  Teacher | teacher | teacher@teacher.com | password |
+|  Parent | parent | parent@parent.com | password |
+|  Student | student | student@student.com | password |
 
 #### **FUNCTIONS OF ACCOUNTS** 
 
@@ -73,13 +70,6 @@ After seeding. Login details as follows:
 - Notices are visible in calendar in dashboard
 - Edit system settings
 - Manage Payments & fees
-
-**-- ACCOUNTANT**
-- Manage Payments & fees
-- Print Payment Receipts
-
-**-- LIBRARIAN**
-- Manage Books in the Library
 
 **-- TEACHER**
 - Manage Own Class/Section
@@ -105,19 +95,3 @@ After seeding. Login details as follows:
 - View noticeboard and school events in calendar
 - Manage own profile
 
-### **Contributing**
-
-Your Contributions & suggestions are welcomed. Please use Pull Request
-
-### **Security Vulnerabilities**
-
-If you discover a security vulnerability within LAV_SMS, please send an e-mail to CJ Inspired via cjay.pub@gmail.com. All security vulnerabilities will be promptly addressed.
-
-***Please Note*** that some sections of this project are in the work-in-progress stage and would be updated soon. These include:
-
-- The Noticeboard/Calendar in the Dashboard Area
-- Librarian/Acountant user pages
-- Library Resources/Study Materials Upload for Students
-
-### **Contact [CJ INSPIRED]**
-- Phone : +2347068149559-->

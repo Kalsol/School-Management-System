@@ -88,7 +88,7 @@ class UserController extends Controller
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
             $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type).$data['code'], $f['name']);
-            $data['photo'] = asset('storage/' . $f['path']);
+            $data['photo'] = Storage::url($f['path']);
         }
 
         /* Ensure that both username and Email are not blank*/
@@ -139,7 +139,7 @@ class UserController extends Controller
             $f = Qs::getFileMetaData($photo);
             $f['name'] = 'photo.' . $f['ext'];
             $f['path'] = $photo->storeAs(Qs::getUploadPath($user_type).$user->code, $f['name']);
-            $data['photo'] = asset('storage/' . $f['path']);
+            $data['photo'] = Storage::url($f['path']);
         }
 
         $this->user->update($id, $data);   /* UPDATE USER RECORD */
