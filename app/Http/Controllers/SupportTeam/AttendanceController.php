@@ -42,7 +42,7 @@ class AttendanceController extends Controller
      */
      public function getStudentMap()
      {
-         $users = User::whereNotNull('photo')->get(['id', 'photo']);
+         $users = User::whereNotNull('photo')->where('user_type', 'student')->get(['id', 'photo']);
         //  dd($users->pluck('photo'));
          $map = $users->mapWithKeys(function ($user) {
      
@@ -55,13 +55,13 @@ class AttendanceController extends Controller
      
              return [$folder => $user->id];
          });
-     
+        // dd($map);
          return response()->json($map);
      }
      
      public function getTeacherMap()
      {
-         $users = User::whereNotNull('photo')->get(['id', 'photo']);
+         $users = User::whereNotNull('photo')->where('user_type', 'student')->get(['id', 'photo']);
          $map = $users->mapWithKeys(function ($user) {
              // This gets 'photo.jpg' from 'http://.../Teach123/photo.jpg'
              return [basename($user->photo) => $user->id];
@@ -72,8 +72,8 @@ class AttendanceController extends Controller
     /**
      * API: Mark attendance from Python detection
      */
-     public function markStudentByFace(Request $request)
-     {
+    public function markStudentByFace(Request $request)
+    {
          $studentId = $request->student_id;
          $sessionDate = $request->session_id;
          $currentTime = now();
@@ -115,39 +115,40 @@ class AttendanceController extends Controller
              'message' => "Marked as $status",
          ], 201);
      }
+
     public function markTeacherByFace(Request $request)
     {
-        $teacherId = $request->teacher_id;
-        $teacher = StaffRecord::find($teacherId);
-        if (!$teacher) {
-            return response()->json(['message' => 'Teacher not found'], 404);
-        }
+            $teacherId = $request->teacher_id;
+            $teacher = StaffRecord::find($teacherId);
+            if (!$teacher) {
+                return response()->json(['message' => 'Teacher not found'], 404);
+            }
 
-        $currentTime = Carbon::now();
-        $sessionDate = $currentTime->toDateString();
-        $startTime = Carbon::createFromFormat('H:i', '02:00');
-        $gracePeriodMinutes = 20;
+            $currentTime = Carbon::now();
+            $sessionDate = $currentTime->toDateString();
+            $startTime = Carbon::createFromFormat('H:i', '02:00');
+            $gracePeriodMinutes = 20;
 
-        $diff = $startTime->diffInMinutes($currentTime, false);
+            $diff = $startTime->diffInMinutes($currentTime, false);
 
-        // If current time is more than 20 mins past 2:00 PM, mark as Late
-        $status = ($diff > $gracePeriodMinutes) ? 'Late' : 'Present';
+            // If current time is more than 20 mins past 2:00 PM, mark as Late
+            $status = ($diff > $gracePeriodMinutes) ? 'Late' : 'Present';
 
-        // 4. Save the record
-        TeachersAttendance::create([
-            'teacher_id' => $teacherId,
-            'session_id' => $teacher->session, // The academic year session
-            'attendance_date' => $sessionDate,
-            'time_in' => $currentTime->toTimeString(),
-            'minutes_late' => ($diff > 0) ? $diff : 0,
-            'status' => $status,
-        ]);
+            // 4. Save the record
+            TeachersAttendance::create([
+                'teacher_id' => $teacherId,
+                'session_id' => $teacher->session, // The academic year session
+                'attendance_date' => $sessionDate,
+                'time_in' => $currentTime->toTimeString(),
+                'minutes_late' => ($diff > 0) ? $diff : 0,
+                'status' => $status,
+            ]);
 
-        return response()->json([
-            'message' => "Success: Marked as $status",
-            'status' => $status,
-            'time' => $currentTime->format('h:i A')
-        ], 201);
+            return response()->json([
+                'message' => "Success: Marked as $status",
+                'status' => $status,
+                'time' => $currentTime->format('h:i A')
+            ], 201);
     }
 
     /**

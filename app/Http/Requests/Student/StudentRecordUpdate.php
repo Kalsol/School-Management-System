@@ -24,8 +24,8 @@ class StudentRecordUpdate extends FormRequest
             'name' => 'required|string|min:6|max:150',
             'gender' => 'required|string',
             'phone' => 'sometimes|nullable|string|min:6|max:20',
-            'email' => 'sometimes|nullable|email|max:100|unique:users,id',
-            'photo' => 'sometimes|nullable|image|mimes:jpeg,gif,png,jpg|max:2048',
+            'email' => 'required|email|max:100|unique:users,id',
+            'photo' => 'required|image|mimes:jpeg,gif,png,jpg',
             'address' => 'required|string|min:6|max:120',
             'bg_id' => 'sometimes|nullable',
             'my_class_id' => 'required',
@@ -33,7 +33,7 @@ class StudentRecordUpdate extends FormRequest
             'state_id' => 'required',
             'lga_id' => 'required',
             'nal_id' => 'required',
-            'my_parent_id' => 'sometimes|nullable',
+            'my_parent_id' => 'required',
         ];
     }
 
@@ -50,14 +50,14 @@ class StudentRecordUpdate extends FormRequest
         ];
     }
 
-    protected function getValidatorInstance()
-    {
-        $input = $this->all();
+    // protected function getValidatorInstance()
+    // {
+    //     $input = $this->all();
 
-        $input['my_parent_id'] = $input['my_parent_id'] ? Qs::decodeHash($input['my_parent_id']) : NULL;
+    //     $input['my_parent_id'] = $input['my_parent_id'] ? Qs::decodeHash($input['my_parent_id']) : NULL;
 
-        $this->getInputSource()->replace($input);
+    //     $this->getInputSource()->replace($input);
 
-        return parent::getValidatorInstance();
-    }
+    //     return parent::getValidatorInstance();
+    // }
 }

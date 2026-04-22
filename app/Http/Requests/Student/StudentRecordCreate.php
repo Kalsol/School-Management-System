@@ -35,7 +35,7 @@ class StudentRecordCreate extends FormRequest
             'nal_id' => 'required',
             'my_class_id' => 'required',
             'section_id' => 'required',
-            'my_parent_id' => 'sometimes|nullable',
+            'my_parent_id' => 'sometimes|',
         ];
     }
 
@@ -52,14 +52,14 @@ class StudentRecordCreate extends FormRequest
         ];
     }
 
-    protected function getValidatorInstance()
-    {
-        $input = $this->all();
+    // protected function getValidatorInstance()
+    // {
+    //     $input = $this->all();
 
-        $input['my_parent_id'] = $input['my_parent_id'] ? Qs::decodeHash($input['my_parent_id']) : NULL;
+    //     $input['my_parent_id'] = $input['my_parent_id'] ? Qs::decodeHash($input['my_parent_id']) : NULL;
 
-        $this->getInputSource()->replace($input);
+    //     $this->getInputSource()->replace($input);
 
-        return parent::getValidatorInstance();
-    }
+    //     return parent::getValidatorInstance();
+    // }
 }

@@ -9,6 +9,7 @@ use Hashids\Hashids;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use DateTime;
+use Illuminate\Support\Facades\Log;
 
 class Qs
 {
@@ -32,7 +33,7 @@ class Qs
 
     public static function getAppCode()
     {
-        return self::getSetting('system_title') ?: 'Yeneta School';
+        return self::getSetting('system_title') ?: 'Arsi Spacial School';
     }
 
     public static function getDefaultUserImage()
@@ -66,7 +67,7 @@ class Qs
 
     public static function getTeamAccount()
     {
-        return ['admin', 'super_admin', 'accountant'];
+        return ['admin', 'super_admin'];
     }
 
     public static function getTeamSAT()
@@ -130,14 +131,15 @@ class Qs
     public static function getStudentData($remove = [])
     {
         $data = ['my_class_id', 'section_id', 'my_parent_id', 'year_admitted', 'house', 'age'];
-
+        
+        Log::info($data);
         return $remove ? array_values(array_diff($data, $remove)) : $data;
 
     }
 
     public static function decodeHash($str, $toString = true)
     {
-        $date = 'yene_school_permanent_salt_feven';
+        $date = 'arsi';
         $hash = new Hashids($date, 14);
         $decoded = $hash->decode($str);
         return $toString ? implode(',', $decoded) : $decoded;
@@ -205,7 +207,7 @@ class Qs
 
     public static function getStaff($remove=[])
     {
-        $data =  ['super_admin', 'admin', 'teacher', 'accountant', 'librarian'];
+        $data =  ['super_admin', 'admin', 'teacher', ];
         return $remove ? array_values(array_diff($data, $remove)) : $data;
     }
 

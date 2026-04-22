@@ -13,6 +13,7 @@ use App\Repositories\UserRepo;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -53,11 +54,10 @@ class StudentRecordController extends Controller
     {
         $data =  $req->only(Qs::getUserRecord());
         $sr =  $req->only(Qs::getStudentData());
+        Log::info($sr);
 
         $ct = $this->my_class->findTypeByClass($req->my_class_id)->code;
-        /* $ct = ($ct == 'J') ? 'JSS' : $ct;
-        $ct = ($ct == 'S') ? 'SS' : $ct;*/
-
+      
         $data['user_type'] = 'student';
         $data['name'] = ucwords($req->name);
         $data['code'] = strtoupper(Str::random(10));
@@ -65,7 +65,6 @@ class StudentRecordController extends Controller
         $data['photo'] = Qs::getDefaultUserImage();
         $adm_no = $req->adm_no;
         $data['username'] = strtoupper(Qs::getAppCode() . '/' . $ct . '/' . $sr['year_admitted'] . '/' . ($adm_no ?: mt_rand(1000, 99999)));
-
 
         if ($req->hasFile('photo')) {
 
@@ -85,6 +84,7 @@ class StudentRecordController extends Controller
             Storage::put($folder . '/' . $filename, (string) $image);
 
             $data['photo'] = Storage::url($folder . '/' . $filename);
+            Log::info($data['photo']);
         }
 
         $user = $this->user->create($data); // Create User
@@ -92,7 +92,7 @@ class StudentRecordController extends Controller
         $sr['adm_no'] = $data['username'];
         $sr['user_id'] = $user->id;
         $sr['session'] = Qs::getSetting('current_session');
-
+        
         $this->student->createRecord($sr); // Create Student
         return Qs::jsonStoreOk();
     }
