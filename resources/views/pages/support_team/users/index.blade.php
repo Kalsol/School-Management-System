@@ -190,7 +190,7 @@
                         @foreach($users->where('user_type', $ut->title) as $u)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td><img class="rounded-circle" style="height: 40px; width: 40px;" src="{{ asset($u->photo) }}" alt="photo">{{ asset($u->photo) }}</td>
+                            <td><img class="rounded-circle" style="height: 40px; width: 40px;" src="{{ $u->photo }}" alt="photo"></td>
                             <td>{{ $u->name }}</td>
                             <td>{{ $u->username }}</td>
                             <td>{{ $u->phone }}</td>

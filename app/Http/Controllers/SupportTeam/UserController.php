@@ -8,6 +8,7 @@ use App\Repositories\LocationRepo;
 use App\Repositories\MyClassRepo;
 use App\Repositories\UserRepo;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -43,6 +44,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
+        
         $id = Qs::decodeHash($id);
         $d['user'] = $this->user->find($id);
         $d['states'] = $this->loc->getStates();

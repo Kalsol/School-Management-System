@@ -154,7 +154,7 @@
                         <label for="my_parent_id">Parent: </label>
                         <select data-placeholder="Choose..." name="my_parent_id" id="my_parent_id" class="select-search form-control">
                             @foreach($parents as $p)
-                            <option {{ (old('my_parent_id') == $p->id) ? 'selected' : '' }} value="{{ $p->id }}">{{ $p->name }}{{ $p->id }}</option>
+                            <option {{ (old('my_parent_id') == $p->id) ? 'selected' : '' }} value="{{ $p->id }}">{{ $p->name }}</option>
                             @endforeach
                         </select>
                     </div>

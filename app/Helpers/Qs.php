@@ -109,7 +109,7 @@ class Qs
 
     public static function hash($id)
     {
-        $date = 'yene_school_permanent_salt_feven';
+        $date = 'arsi';
         $hash = new Hashids($date, 14);
         return $hash->encode($id);
     }

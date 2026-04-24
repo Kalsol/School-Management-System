@@ -6,7 +6,6 @@ import cv2
 import face_recognition
 import numpy as np
 import requests
-from PIL import Image
 
 # ---------------- CONFIG ---------------- #
 PHONE_IP = "10.47.116.232"
@@ -14,6 +13,7 @@ BASE_URL = "http://127.0.0.1:8000"
 
 STREAM_URL = f"http://{PHONE_IP}:8080/video"
 
+# Use raw string for Windows paths to avoid escape character issues
 FACES_DIR = r"C:\Users\Tati\Desktop\SoftwareDevelopment\lav_sms\storage\app\public\uploads\student"
 
 CURRENT_SESSION_DATE = datetime.now().strftime("%Y-%m-%d")
@@ -41,47 +41,64 @@ print("\nScanning student folders...")
 
 for root, dirs, files in os.walk(FACES_DIR):
     for filename in files:
+        # Only process image files
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            continue
 
         path = os.path.join(root, filename)
 
-        # Get folder name (STU001)
+        # Get folder name (e.g., STU001)
         student_code = os.path.basename(root)
 
         if student_code not in student_map:
             continue
 
         try:
-            # 🔥 FIX IMAGE FORMAT
-            pil_image = Image.open(path).convert("RGB")
-            img = np.array(pil_image)
+            # 🔥 USE OPENCV INSTEAD OF PIL
+            # cv2.imread loads images as BGR by default
+            bgr_img = cv2.imread(path)
+            
+            if bgr_img is None:
+                print(f"❌ Could not read image: {filename}")
+                continue
 
-            encodings = face_recognition.face_encodings(img)
+            # Convert to RGB (required by face_recognition)
+            rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+            
+            # Final safety cast to 8-bit
+            img_final = np.array(rgb_img, dtype=np.uint8)
+
+            encodings = face_recognition.face_encodings(img_final)
 
             if len(encodings) > 0:
                 known_encodings.append(encodings[0])
                 known_names.append(str(student_map[student_code]))
-
                 print(f"✔ Encoded {student_code}")
+            else:
+                print(f"⚠️ No face found in {filename}")
 
         except Exception as e:
             print(f"❌ Error with {filename}: {e}")
 
 if not known_encodings:
-    print("FATAL: No faces loaded!")
+    print("FATAL: No faces loaded! Check your image directory and formats.")
     exit()
 
 print(f"\nLoaded {len(known_encodings)} faces successfully.\n")
 
 # 🔥 3. CAMERA START
-video = cv2.VideoCapture(STREAM_URL)
+video = cv2.VideoCapture(0)
 
 print("Camera started... Press 'q' to quit.\n")
 
 while True:
     ret, frame = video.read()
     if not ret:
+        print("Failed to grab frame from stream.")
+        time.sleep(1)
         continue
 
+    # Resize for faster processing
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
     rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
@@ -90,6 +107,7 @@ while True:
 
     for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
 
+        # Lower tolerance = stricter matching (0.5 is a good balance)
         matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.5)
 
         name = "Unknown"
@@ -104,6 +122,7 @@ while True:
 
             current_time = time.time()
 
+            # Prevent spamming the API (30-second cooldown per student)
             if student_id not in last_seen or (current_time - last_seen[student_id] > 30):
 
                 print(f"Marking {student_id}...")
@@ -119,14 +138,13 @@ while True:
                         data=payload
                     )
 
-                    print("Server:", response.text)
-
+                    print("Server Response:", response.status_code)
                     last_seen[student_id] = current_time
 
                 except Exception as e:
                     print("API Error:", e)
 
-        # Draw box
+        # Scale back up face locations since the frame we detected in was 1/4 size
         top *= 4
         right *= 4
         bottom *= 4

@@ -1,7 +1,8 @@
 <script> 
 
     function getLGA(state_id){
-        var url = '{{ route('get_lga',[':id']) }}';
+
+        var url = "{{ route('get_lga', [':id']) }}";
         url = url.replace(':id', state_id);
         var lga = $('#lga_id');
 
@@ -48,7 +49,7 @@
         if(!class_id) return; // Exit if no class is selected
     
         // Point to the combined route (using get_class_subjects since it returns both)
-        var url = '{{ route('get_class_subjects', [':id']) }}';
+        var url = "{{ route('get_class_subjects', [':id']) }}";
         url = url.replace(':id', class_id);
         
         var sectionSelect = $('#section_id');
@@ -101,7 +102,7 @@
     }
     
     function getClassSections(class_id, destination){
-            var url = '{{ route('get_class_sections', [':id']) }}';
+            var url = "{{ route('get_class_sections', [':id']) }}";
             url = url.replace(':id', class_id);
             var section = destination ? $(destination) : $('#section_id');
     
@@ -151,7 +152,7 @@
         } else if(termId === '2') {
             termText = 'Second Term';
         }
-        var session = '{{ Qs::getSetting('current_session') }}';
+        var session = "{{ Qs::getSetting('current_session') }}";
         var generatedName = termText + ' ' + 'Exam and Assessment Marking for' + ' ' + session;
         $('#marking_name').val(generatedName);
         $('#marking_name').prop('readonly', true);
@@ -197,7 +198,7 @@
 
     function setNoticeAsViwed(el)
     {
-        var url = '{{ route("notices.set_viewed") }}';
+        var url = "{{ route('notices.set_viewed') }}";
         $.ajax({
             dataType: 'json',
             method: "post",
@@ -315,31 +316,31 @@
     {{--Notifications--}}
 
     @if (session('pop_error'))
-    pop({msg : '{{ session('pop_error') }}', type : 'error'});
+    pop({msg : "{{ session('pop_error') }}", type : "error"});
     @endif
 
     @if (session('pop_warning'))
-    pop({msg : '{{ session('pop_warning') }}', type : 'warning'});
+    pop({msg : "{{ session('pop_warning') }}", type : "warning"});
     @endif
 
     @if (session('pop_success'))
-    pop({msg : '{{ session('pop_success') }}', type : 'success', title: 'GREAT!!'});
+    pop({msg : "{{ session('pop_success') }}", type : 'success', title: 'GREAT!!'});
     @endif
 
     @if (session('flash_info'))
-      flash({msg : '{{ session('flash_info') }}', type : 'info'});
+      flash({msg : "{{ session('flash_info') }}", type : 'info'});
     @endif
 
     @if (session('flash_success'))
-      flash({msg : '{{ session('flash_success') }}', type : 'success'});
+      flash({msg : "{{ session('flash_success') }}", type : 'success'});
     @endif
 
     @if (session('flash_warning'))
-      flash({msg : '{{ session('flash_warning') }}', type : 'warning'});
+      flash({msg : "{{ session('flash_warning') }}", type : 'warning'});
     @endif
 
      @if (session('flash_error') || session('flash_danger'))
-      flash({msg : '{{ session('flash_error') ?: session('flash_danger') }}', type : 'danger'});
+      flash({msg : "{{ session('flash_error') ?: session('flash_danger') }}", type : 'danger'});
     @endif
 
     {{--End Notifications--}}
