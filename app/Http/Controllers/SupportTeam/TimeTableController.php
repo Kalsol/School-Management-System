@@ -61,6 +61,7 @@ class TimeTableController extends Controller
 
     public function store(TTRequest $req)
     {
+        dd($req->all());
         $data = $req->all();
         $tms = $this->tt->findTimeSlot($req->ts_id);
         $d_date = $req->exam_date ?? $req->day;

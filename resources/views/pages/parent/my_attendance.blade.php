@@ -7,15 +7,19 @@
     <div class="card-body">
         <h6 class="font-weight-bold mb-3"><i class="icon-filter3 mr-2 text-primary"></i>Filter History</h6>
         <form action="{{ Request::url() }}" method="GET" class="row align-items-end">
-            
+
             {{-- Student Filter (Only for Parents) --}}
             @if(Qs::userIsParent())
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="font-weight-bold small text-uppercase text-muted">Student</label>
+                {{-- CHANGE THIS SECTION --}}
                 <select name="student_id" class="form-control select shadow-none">
                     <option value="">All Students</option>
                     @foreach($my_children as $child)
-                        <option value="{{ $child->id }}" {{ request('student_id') == $child->id ? 'selected' : '' }}>{{ $child->user->name }}</option>
+                    {{-- Change $child->id to $child->user_id --}}
+                    <option value="{{ $child->user_id }}" {{ request('student_id') == $child->user_id ? 'selected' : '' }}>
+                        {{ $child->user->name }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -80,38 +84,36 @@
                     </td>
                     <td>
                         <small><i>{{ $at->remarks ?? 'No remarks yet' }}</i></small>
-                        @if($at->is_excused) 
-                            <span class="text-success small d-block"><i class="icon-checkmark4 mr-1"></i>Approved</span> 
+                        @if($at->is_excused)
+                        <span class="text-success small d-block"><i class="icon-checkmark4 mr-1"></i>Approved</span>
                         @endif
                     </td>
                     <td class="text-center">
-                        @if(Qs::userIsParent() && !$at->is_excused && $at->status != 'Present')
-                        <button type="button" class="btn btn-sm btn-light border" data-toggle="modal" data-target="#excuseModal{{ $at->id }}">
-                            <i class="icon-paperplane mr-1"></i> Submit Excuse
-                        </button>
-                        {{-- Modal code remains the same --}}
-                        <div class="modal fade" id="excuseModal{{ $at->id }}" tabindex="-1" role="dialog">
-                            <div class="modal-dialog" role="document">
-                                <form action="{{ route('attendance.submit_excuse', $at->id) }}" method="POST">
-                                    @csrf
-                                    <div class="modal-content text-left">
-                                        <div class="modal-header bg-primary text-white">
-                                            <h5 class="modal-title">Reason for Absence/Lateness</h5>
-                                            <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="form-group">
-                                                <label class="font-weight-semibold">Explain why the student was late or absent:</label>
-                                                <textarea name="remarks" class="form-control" rows="3" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary px-4">Submit Reason</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        @if(Qs::userIsParent())
+
+                        {{-- Case 1: Attendance is already excused/approved --}}
+                        @if($at->is_excused)
+                        <span class="badge badge-success">
+                            <i class="icon-checkmark4 mr-1"></i> Excused
+                        </span>
+
+                        {{-- Case 2: Parent submitted a reason, but Admin hasn't approved it yet --}}
+                        @elseif($at->remarks && !$at->is_excused)
+                        <span class="badge badge-flat border-warning text-warning-600">
+                            <i class="icon-spinner2 spinner mr-1"></i> Pending Approval
+                        </span>
+
+                        {{-- Case 3: Student was Late/Absent and no excuse has been sent yet --}}
+                        @elseif($at->status != 'Present')
+                        <a href="{{ route('attendance.create_excuse', $at->id) }}" class="btn btn-sm btn-light border shadow-sm">
+                            <i class="icon-paperplane mr-1 text-primary"></i> Submit Excuse
+                        </a>
+
+                        {{-- Case 4: Student was Present (No action needed) --}}
+                        @else
+                        <span class="text-muted small">---</span>
+                        @endif
+
                         @endif
                     </td>
                 </tr>

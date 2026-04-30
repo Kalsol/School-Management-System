@@ -143,7 +143,7 @@
                         </li>
                         @endif
 
-                        @if(Qs::userIsTeamSAT())
+                        @if(Qs::userIsTeacher())
                         <li class="nav-item">
                             <a href="{{ route('marks.index') }}" class="nav-link {{ in_array(Route::currentRouteName(), ['marks.index']) ? 'active' : '' }}">Marks</a>
                         </li>

@@ -31,12 +31,13 @@
 
                 </div>
 
+        @if(QS::userIsTeamSAT())
             {{--    EXAM COMMENTS   --}}
             @include('pages.support_team.marks.show.comments')
 
             {{-- SKILL RATING --}}
             @include('pages.support_team.marks.show.skills')
-
+        @endif
         @endforeach
     @endforeach
 

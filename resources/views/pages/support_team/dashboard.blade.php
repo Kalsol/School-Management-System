@@ -63,99 +63,90 @@
 </div>
 @endif
 
-{{-- 1. PARENT / STUDENT DASHBOARD (TOP SECTION) --}}
 @if(Qs::userIsParent() || Qs::userIsStudent())
-@if(Qs::userIsParent() && isset($firstLoadChild))
-<div class="row mb-3">
-    <div class="col-md-12">
-        <div class="card bg-light border-left-info border-left-3 shadow-sm">
-            <div class="card-body d-flex justify-content-between align-items-center py-2">
-                <div>
-                    <span class="font-weight-semibold text-muted">CHILD CONTEXT:</span>
-                    <span class="text-primary font-weight-bold ml-1">
-                        {{ $firstLoadChild->user->name }} ({{ $firstLoadChild->my_class->name }}{{ $firstLoadChild->section->name }})
-                    </span>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-info dropdown-toggle shadow-0" data-toggle="dropdown">Switch Child</button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        @foreach($childrenList as $child)
-                        <a href="{{ route('dashboard', ['student_id' => Qs::hash($child->id)]) }}"
-                            class="dropdown-item {{ $firstLoadChild->id == $child->id ? 'active' : '' }}">
-                            {{ $child->user->name }}
-                        </a>
-                        @endforeach
+    @if(Qs::userIsParent() && isset($firstLoadChild))
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card bg-light border-left-info border-left-3 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <span class="font-weight-semibold text-muted">CHILD CONTEXT:</span>
+                        <span class="text-primary font-weight-bold ml-1">
+                            {{ $firstLoadChild->user->name }} ({{ $firstLoadChild->my_class->name }} {{ $firstLoadChild->section->name }})
+                        </span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">Switch Child</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            @foreach($childrenList as $child)
+                            <a href="{{ route('dashboard', ['student_id' => Qs::hash($child->id)]) }}"
+                                class="dropdown-item {{ $firstLoadChild->id == $child->id ? 'active' : '' }}">
+                                {{ $child->user->name }}
+                            </a>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endif
+    @endif
 
-<div class="row">
-    <div class="col-sm-6 col-xl-4">
-        <div class="card card-body border-left-success border-left-3">
-            <div class="media">
-                <div class="mr-3 align-self-center">
-                    <i class="icon-graduation2 icon-3x text-success-400"></i>
+    <div class="row">
+        <!-- Academic Results -->
+        <div class="col-sm-6 col-xl-4">
+            <div class="card card-body border-left-success border-left-3">
+                <div class="media">
+                    <div class="mr-3 align-self-center"><i class="icon-graduation2 icon-3x text-success-400"></i></div>
+                    <div class="media-body text-right">
+                        <h6 class="media-title font-weight-semibold">Academic Results</h6>
+                        <span class="text-muted">Latest Average: <strong>{{ $avg_mark }}</strong></span><br>
+                        <small class="text-muted">Total Score: {{ $total_score }}</small>
+                    </div>
                 </div>
-                <div class="media-body text-right">
-                    <h6 class="media-title font-weight-semibold">Academic Results</h6>
-                    <span class="text-muted">Latest Average: <strong>{{ $avg_mark }}</strong></span>
-                    <br>
-                    <small class="text-muted">Total Score: {{ $total_score }}</small>
-                </div>
+                <a href="{{ route('marks.year_selector', Qs::hash($firstLoadChild->user_id ?? Auth::id())) }}" class="btn bg-success-400 btn-block btn-sm mt-2">View Mark Sheet</a>
             </div>
-            @if(Qs::userIsParent())
-            <a href="{{ route('marks.year_selector', Qs::hash($firstLoadChild->id)) }}" class="btn bg-success-400 btn-block btn-sm mt-2">View Full Mark Sheet</a>
-            @else
-            <a href="{{ route('marks.year_selector', Qs::hash(Auth::user()->id)) }}" class="btn bg-success-400 btn-block btn-sm mt-2">View Mark Sheet</a>
-            @endif
         </div>
-    </div>
 
-    <div class="col-sm-6 col-xl-4">
-        <div class="card card-body border-left-primary border-left-3">
-            <div class="media">
-                <div class="mr-3 align-self-center"><i class="icon-check icon-3x text-primary-400"></i></div>
-                <div class="media-body text-right">
-                    <h6 class="media-title font-weight-semibold">Attendance</h6>
-                    <span class="text-muted">Today:
-                        <span class="badge badge-success" style="background-color: {{ $today_status == 'Present' ? '#28a745' : '#dc3545' }};">
-                            {{ $today_status }}
+        <!-- Attendance -->
+        <div class="col-sm-6 col-xl-4">
+            <div class="card card-body border-left-primary border-left-3">
+                <div class="media">
+                    <div class="mr-3 align-self-center"><i class="icon-check icon-3x text-primary-400"></i></div>
+                    <div class="media-body text-right">
+                        <h6 class="media-title font-weight-semibold">Attendance</h6>
+                        <span class="text-muted">Today: 
+                            <span class="badge {{ in_array($today_status, ['Present', 'P', 1]) ? 'badge-success' : 'badge-danger' }}">
+                                {{ $today_status }}
+                            </span>
                         </span>
-                    </span>
+                    </div>
                 </div>
+                    <div class="progress progress-xxs mb-1">
+                        <div class="progress-bar bg-primary" style="width: {{ $attendance_val ?? 0 }}%"></div>
+                    </div>
             </div>
-            <div class="mt-2">
-                <div class="progress progress-xxs mb-1">
-                    <div class="progress-bar bg-primary" style="width: {{ $attendance_val }}%"></div>
-                </div>
-            </div>
-            <button class="btn bg-primary-400 btn-block btn-sm mt-1">
-                <a href="{{ route('attendance.my_attendance')}}" class="text-white">Attendance Log</a>
-            </button>
         </div>
-    </div>
 
-    <div class="col-sm-6 col-xl-4">
-        <div class="card card-body border-left-info border-left-3">
-            <div class="media">
-                <div class="mr-3 align-self-center"><i class="icon-alarm icon-3x text-info-400"></i></div>
-                <div class="media-body text-right">
-                    <h6 class="media-title font-weight-semibold">Live Timetable</h6>
-                    <span class="text-muted">Now: <strong>{{ $current_subject }}</strong></span>
+        <!-- Live Timetable -->
+        <div class="col-sm-6 col-xl-4">
+            <div class="card card-body border-left-info border-left-3">
+                <div class="media">
+                    <div class="mr-3 align-self-center"><i class="icon-alarm icon-3x text-info-400"></i></div>
+                    <div class="media-body text-right">
+                        <h6 class="media-title font-weight-semibold">Live Timetable</h6>
+                        <span class="text-muted">Now: <strong class="text-info">{{ $current_subject }}</strong></span>
+                    </div>
+                </div>
+                <div class="bg-light p-1 mt-2 text-center rounded">
+                    <span class="text-muted font-size-xs">{{ $next_class_info }}</span>
                 </div>
             </div>
-            <div class="bg-light p-1 mt-2 text-center rounded">
-                <span class="text-muted font-size-xs">{{ $next_class_info }}</span>
-            </div>
-            {{--<a href="{{ route('tims.show', Qs::hash($firstLoadChild->id)) }}" class="btn bg-info-400 btn-block btn-sm mt-1">Weekly Schedule</a>--}}
         </div>
     </div>
-</div>
 @endif
+
+
 
 {{-- 2. DYNAMIC CONTENT & CONVERSATIONS (MIDDLE SECTION) --}}
 <div class="row">

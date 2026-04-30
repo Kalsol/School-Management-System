@@ -11,6 +11,8 @@ use App\Repositories\MyClassRepo;
 use App\Repositories\StudentRepo;
 use App\Repositories\UserRepo;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\Custom\Student;
+use App\Models\StudentRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -52,12 +54,14 @@ class StudentRecordController extends Controller
 
     public function store(StudentRecordCreate $req)
     {
+        $this->checkNoOfStudentsInClassSection($req->my_class_id, $req->section_id) ?: abort(403, 'Class/Section is Full!');
+        
         $data =  $req->only(Qs::getUserRecord());
         $sr =  $req->only(Qs::getStudentData());
         Log::info($sr);
 
         $ct = $this->my_class->findTypeByClass($req->my_class_id)->code;
-      
+              
         $data['user_type'] = 'student';
         $data['name'] = ucwords($req->name);
         $data['code'] = strtoupper(Str::random(10));
@@ -95,6 +99,15 @@ class StudentRecordController extends Controller
         
         $this->student->createRecord($sr); // Create Student
         return Qs::jsonStoreOk();
+    }
+
+    protected function checkNoOfStudentsInClassSection($class_id, $section_id)
+    {
+        $getStudents = StudentRecord::where('my_class_id', $class_id)->where('section_id', $section_id)->get();
+        if (count($getStudents) >= 30) {    
+            return false;
+        }
+        return true;        
     }
 
     public function listByClass($class_id)

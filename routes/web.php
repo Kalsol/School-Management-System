@@ -129,12 +129,15 @@ Route::group(['middleware' => ['auth','checkForPasswordUpdate',]], function () {
             // Page for students/parents to see their records
             Route::get('/my-attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my_attendance');
             
+            Route::get('/excuse/create/{attendance_id}', [AttendanceController::class, 'createExcuse'])
+                ->name('attendance.create_excuse');
+
+            // Action for parents to submit the excuse
+            Route::post('/submit-excuse/{attendance_id}', [AttendanceController::class, 'submitExcuse'])
+                ->name('attendance.submit_excuse');
+
             // Notify absentees via email and sms
             Route::post('/notify-absentees', [AttendanceController::class, 'notifyAbsentees'])->name('attendance.notify_absentees');
-            
-            // Action for parents to submit the excuse
-            Route::post('/submit-excuse/{id}', [AttendanceController::class, 'submitExcuse'])->name('attendance.submit_excuse');
-        
         });
 
         /*************** Pins *****************/

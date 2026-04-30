@@ -134,11 +134,11 @@ while True:
                     }
 
                     response = requests.post(
-                        f"{BASE_URL}/api/mark-attendance",
+                        f"{BASE_URL}/api/mark-student-attendance",
                         data=payload
                     )
 
-                    print("Server Response:", response.status_code)
+                    print("Server Response:",response.status_code, response.text)
                     last_seen[student_id] = current_time
 
                 except Exception as e:
