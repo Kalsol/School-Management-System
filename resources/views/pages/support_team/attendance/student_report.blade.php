@@ -156,6 +156,34 @@
                                             "{{ $at->remarks }}"
                                         </div>
 
+                                        <!-- Inside the Admin Modal Body -->
+                                        <div class="form-group border-bottom pb-2">
+                                            <label class="font-weight-bold text-muted uppercase small">Parent's Evidence:</label>
+                                            <div class="mt-1">
+                                                @if($at->evidence)
+                                                @php
+                                                $file_ext = strtolower(pathinfo($at->evidence, PATHINFO_EXTENSION));
+                                                $file_path = asset('storage/uploads/attendance_evidence/' . $at->evidence);
+                                                @endphp
+
+                                                @if(in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif']))
+                                                {{-- If it's an image, show a thumbnail that opens the full image --}}
+                                                <a href="{{ $file_path }}" target="_blank">
+                                                    <img src="{{ $file_path }}" alt="Evidence" class="img-thumbnail" style="max-height: 150px;">
+                                                    <div class="small text-primary mt-1"><i class="icon-zoomin3"></i> Click to enlarge</div>
+                                                </a>
+                                                @else
+                                                {{-- If it's a PDF or other file, show a download/view button --}}
+                                                <a href="{{ $file_path }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                                    <i class="icon-file-pdf mr-1"></i> View PDF Document
+                                                </a>
+                                                @endif
+                                                @else
+                                                <span class="text-muted italic">No evidence uploaded by parent.</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
                                         <div class="form-group">
                                             <label class="font-weight-bold text-muted">Admin Response / Feedback:</label>
                                             <textarea id="admin_resp_{{ $at->id }}" class="form-control" rows="3" placeholder="Optional: Provide feedback to parent..."></textarea>
@@ -189,7 +217,7 @@
         // Generate the URL using the route name and a placeholder
         let baseUrl = "{{ route('attendance.update_excuse', ':id') }}";
         let finalUrl = baseUrl.replace(':id', id);
-        
+
         console.log("Final URL for AJAX:", finalUrl); // Debugging line to check the final URL
 
         $.ajax({
