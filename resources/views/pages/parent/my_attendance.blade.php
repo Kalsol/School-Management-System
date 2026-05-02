@@ -83,43 +83,82 @@
                         </span>
                     </td>
                     <td>
-                        <small><i>{{ $at->remarks ?? 'No remarks yet' }}</i></small>
-                        @if($at->is_excused)
-                        <span class="text-success small d-block"><i class="icon-checkmark4 mr-1"></i>Approved</span>
-                        @endif
+                        <div class="d-flex flex-column">
+                            {{-- Show Type & Remarks --}}
+                            @if($at->remarks)
+                            <span class="text-dark font-weight-bold small">{{ $at->excuse_type }}</span>
+                            <small class="text-muted"><i>{{ \Illuminate\Support\Str::limit($at->remarks, 30) }}</i></small>
+                            @else
+                            <small class="text-muted">No remarks yet</small>
+                            @endif
+
+                            {{-- Trigger for Feedback Modal --}}
+                            @if($at->admin_response)
+                            <a href="#" class="mt-1 small font-weight-semibold text-primary" data-toggle="modal" data-target="#feedback{{ $at->id }}">
+                                <i class="icon-comment-discussion mr-1"></i> View Admin Response
+                            </a>
+                            @endif
+                        </div>
                     </td>
                     <td class="text-center">
                         @if(Qs::userIsParent())
 
-                        {{-- Case 1: Attendance is already excused/approved --}}
+                        {{-- Case 1: Approved --}}
                         @if($at->is_excused)
-                        <span class="badge badge-success">
-                            <i class="icon-checkmark4 mr-1"></i> Excused
+                        <span class="badge badge-flat border-success text-success-600 px-2">
+                            <i class="icon-checkmark4 mr-1"></i> Approved
                         </span>
 
-                        {{-- Case 2: Parent submitted a reason, but Admin hasn't approved it yet --}}
-                        @elseif($at->remarks && !$at->is_excused)
-                        <span class="badge badge-flat border-warning text-warning-600">
-                            <i class="icon-spinner2 spinner mr-1"></i> Pending Approval
+                        {{-- Case 2: Rejected (Admin responded, but is_excused is false) --}}
+                        @elseif($at->admin_id && !$at->is_excused)
+                        <span class="badge badge-flat border-danger text-danger-600 px-2">
+                            <i class="icon-cross2 mr-1"></i> Rejected
+                        </span>
+                        <div class="mt-1">
+                            <a href="{{ route('attendance.create_excuse', $at->id) }}" class="small text-muted font-weight-bold"><u>Try Again?</u></a>
+                        </div>
+
+                        {{-- Case 3: Pending Review --}}
+                        @elseif($at->remarks)
+                        <span class="badge badge-flat border-info text-info-600 px-2">
+                            <i class="icon-spinner2 spinner mr-1"></i> Pending Review
                         </span>
 
-                        {{-- Case 3: Student was Late/Absent and no excuse has been sent yet --}}
+                        {{-- Case 4: Not yet submitted --}}
                         @elseif($at->status != 'Present')
-                        <a href="{{ route('attendance.create_excuse', $at->id) }}" class="btn btn-sm btn-light border shadow-sm">
-                            <i class="icon-paperplane mr-1 text-primary"></i> Submit Excuse
+                        <a href="{{ route('attendance.create_excuse', $at->id) }}" class="btn btn-xs btn-primary">
+                            Submit Excuse
                         </a>
-
-                        {{-- Case 4: Student was Present (No action needed) --}}
                         @else
                         <span class="text-muted small">---</span>
                         @endif
 
                         @endif
+
+                        {{-- ADMIN FEEDBACK MODAL --}}
+                        @if($at->admin_response)
+                        <div class="modal fade" id="feedback{{ $at->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-sm">
+                                <div class="modal-content text-left">
+                                    <div class="modal-header bg-light">
+                                        <h6 class="modal-title">Admin Feedback</h6>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="small text-muted mb-2">Processed: {{ \Carbon\Carbon::parse($at->handled_at)->format('d M, Y') }}</p>
+                                        <div class="p-2 border-left-warning border-left-3 bg-light">
+                                            "{{ $at->admin_response }}"
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">No attendance records found for the selected criteria.</td>
+                    <td colspan="6" class="text-center text-muted py-4">No records found.</td>
                 </tr>
                 @endforelse
             </tbody>

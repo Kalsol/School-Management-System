@@ -11,15 +11,15 @@ use Illuminate\Http\Request;
 use App\Helpers\Qs;
 use App\Mail\AbsenteeNotification;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Http;
 use App\Jobs\SendAttendanceSms;
 use App\Repositories\MyClassRepo;
 use App\Models\TeachersAttendance;
 use App\Models\StaffRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+
 
 class AttendanceController extends Controller
 {
@@ -371,13 +371,36 @@ class AttendanceController extends Controller
             'remarks' => $request->remarks,
             'excuse_type' => $request->excuse_type,
             'is_excused' => false,
+            'admin_id' => null,       // Reset so it becomes "Pending" again
+            'admin_response' => null, // Clear old rejection message
+            'handled_at' => null,     // Clear old timestamp
         ];
 
-        // Handle File Upload
         if ($request->hasFile('evidence')) {
             $file = $request->file('evidence');
-            $filename = 'excuse_' . $attendance_id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/attendance_evidence'), $filename);
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename = 'excuse_' . $attendance_id . '_' . time() . '.' . $extension;
+            $folder = 'uploads/attendance_evidence';
+
+            // List of image extensions we can process
+            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+            if (in_array($extension, $imageExtensions)) {
+                // ✅ IT'S AN IMAGE: Resize and Optimize
+                $processedImage = Image::make($file)
+                    ->orientate()
+                    ->resize(800, null, function ($constraint) {
+                        $constraint->aspectRatio(); // Keep it from looking stretched
+                        $constraint->upsize();     // Don't make small images bigger
+                    })
+                    ->encode($extension, 80); // Keep original format but compress to 80%
+
+                Storage::disk('public')->put($folder . '/' . $filename, (string) $processedImage);
+            } else {
+                // ✅ IT'S A PDF/DOC: Just move it (Don't use Intervention Image)
+                $file->storeAs($folder, $filename, 'public');
+            }
+
             $data['evidence'] = $filename;
         }
 
