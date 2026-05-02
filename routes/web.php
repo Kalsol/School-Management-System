@@ -136,6 +136,9 @@ Route::group(['middleware' => ['auth','checkForPasswordUpdate',]], function () {
             Route::post('/submit-excuse/{attendance_id}', [AttendanceController::class, 'submitExcuse'])
                 ->name('attendance.submit_excuse');
 
+            Route::post('/update-excuse/{attendance_id}', [AttendanceController::class, 'updateExcuse'])
+                ->name('attendance.update_excuse');
+
             // Notify absentees via email and sms
             Route::post('/notify-absentees', [AttendanceController::class, 'notifyAbsentees'])->name('attendance.notify_absentees');
         });

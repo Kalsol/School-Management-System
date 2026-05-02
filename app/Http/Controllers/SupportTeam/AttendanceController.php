@@ -187,6 +187,8 @@ class AttendanceController extends Controller
 
         $attendances = $query->orderBy('time_in', 'desc')->get();
 
+        // dd($attendances);
+
         return view('pages.support_team.attendance.student_report', compact(
             'attendances',
             'date',
@@ -230,7 +232,6 @@ class AttendanceController extends Controller
             'section_id'
         ));
     }
-
 
     /**
      * TRIGGER 1: Daily Absentee Alert (Run every day at 3:00 PM)
@@ -287,22 +288,50 @@ class AttendanceController extends Controller
         }
     }
 
-    public function viewExcuses()
+    public function updateExcuse(Request $request, $attendance_id)
     {
-        $excuses = Attendance::whereNotNull('remarks')
-            ->where('is_excused', false)
-            ->with('user')
-            ->get();
+        Log::info("Update Excuse Request: " . json_encode($request->all()) . " for Attendance ID: " . $attendance_id);
+        try {
+            $at = Attendance::findOrFail($attendance_id);
 
-        return view('pages.support_team.attendance.excuses', compact('excuses'));
+            // Safety check: ensure user is logged in
+            if (!auth()->check()) {
+                return response()->json(['ok' => false, 'msg' => 'Session expired. Please login.'], 401);
+            }
+
+            $updateData = [
+                'admin_response' => $request->admin_response,
+                'admin_id'       => auth()->id(),
+                'handled_at'     => now(),
+            ];
+
+            if ($request->action == 'approve') {
+                $updateData['is_excused'] = true;
+                $updateData['status']     = 'Present';
+                $message = "Excuse approved. Status changed to Present.";
+            } else {
+                $updateData['is_excused'] = false;
+                // We keep the original status (Absent/Late) if rejected
+                $message = "Excuse has been rejected.";
+            }
+
+            $at->update($updateData);
+
+            return response()->json([
+                'ok' => true,
+                'msg' => $message
+            ]);
+        } catch (\Exception $e) {
+            // Log the error so you can see it in storage/logs/laravel.log
+            \Log::error("Attendance Update Error: " . $e->getMessage());
+
+            return response()->json([
+                'ok' => false,
+                'msg' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
-
-    public function approveExcuse($id)
-    {
-        Attendance::findOrFail($id)->update(['is_excused' => true, 'status' => 'Present']);
-        return back()->with('flash_success', 'Excuse Approved. Student status updated to Present.');
-    }
-
+    
     public function createExcuse($attendance_id)
     {
         // Find the attendance record or fail if not found
@@ -319,15 +348,18 @@ class AttendanceController extends Controller
         return view('pages.parent.attendance_excuse', compact('attendance'));
     }
 
+    // Updated  will check
     public function submitExcuse(Request $request, $attendance_id)
     {
         $request->validate([
             'remarks' => 'required|string|max:500',
+            'excuse_type' => 'required|string',
+            'evidence' => 'nullable|mimes:pdf,jpg,jpeg,png|max:2048', // Max 2MB
         ]);
 
         $attendance = Attendance::findOrFail($attendance_id);
 
-        // Security check: Ensure the parent actually owns this student
+        // Security check
         if (Qs::userIsParent()) {
             $childIds = StudentRecord::where('my_parent_id', auth()->id())->pluck('user_id')->toArray();
             if (!in_array($attendance->student_id, $childIds)) {
@@ -335,12 +367,23 @@ class AttendanceController extends Controller
             }
         }
 
-        $attendance->update([
+        $data = [
             'remarks' => $request->remarks,
-            'is_excused' => false, // Set to false so admin can review it
-        ]);
+            'excuse_type' => $request->excuse_type,
+            'is_excused' => false,
+        ];
 
-        return back()->with('flash_success', 'Excuse submitted successfully and pending approval.');
+        // Handle File Upload
+        if ($request->hasFile('evidence')) {
+            $file = $request->file('evidence');
+            $filename = 'excuse_' . $attendance_id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/attendance_evidence'), $filename);
+            $data['evidence'] = $filename;
+        }
+
+        $attendance->update($data);
+
+        return redirect()->route('attendance.my_attendance')->with('flash_success', 'Excuse submitted successfully and pending review.');
     }
 
     public function myAttendance(Request $request)

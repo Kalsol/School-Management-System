@@ -8,9 +8,26 @@ use Illuminate\Database\Eloquent\Model;
 class Attendance extends Model
 {
     protected $fillable = [
-        'student_id', 'class_id', 'section_id', 'session_id', 
-        'attendance_date', 'time_in', 'session_actual_start', 
-        'minutes_late', 'status'
+        'student_id',
+        'class_id',
+        'section_id',
+        'session_id',
+        'attendance_date',
+        'time_in',
+        'minutes_late',
+        'status',
+        'remarks',
+        'is_excused',
+        'excuse_type',
+        'evidence',
+        'admin_response',
+        'admin_id',
+        'handled_at'
+    ];
+
+    protected $casts = [
+    'handled_at' => 'datetime',
+    'is_excused' => 'boolean',
     ];
 
     public function user()
