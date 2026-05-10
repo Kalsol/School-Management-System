@@ -36,7 +36,7 @@ class TimeTableController extends Controller
         $d['exams'] = $this->exam->getExam(['year' => $this->year]);
         $d['my_classes'] = $this->my_class->all();
         $d['tt_records'] = $this->tt->getAllRecords();
-        
+
         return view('pages.support_team.timetables.index', $d);
     }
 

@@ -121,6 +121,8 @@ class UserController extends Controller
 
         $user = $this->user->find($id);
 
+        dd($user);
+
         $user_type = $user->user_type;
         $user_is_staff = in_array($user_type, Qs::getStaff());
         $user_is_teamSA = in_array($user_type, Qs::getTeamSA());

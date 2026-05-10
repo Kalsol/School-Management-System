@@ -129,7 +129,7 @@ while True:
 
                 try:
                     payload = {
-                        "student_id": teacher_id,
+                        "teacher_id": teacher_id,
                         "session_id": CURRENT_SESSION_DATE,
                     }
 

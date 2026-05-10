@@ -63,10 +63,16 @@ class AttendanceController extends Controller
 
     public function getTeacherMap()
     {
-        $users = User::whereNotNull('photo')->where('user_type', 'student')->get(['id', 'photo']);
+        $users = User::whereNotNull('photo')->where('user_type', 'teacher')->get(['id', 'photo']);
         $map = $users->mapWithKeys(function ($user) {
-            // This gets 'photo.jpg' from 'http://.../Teach123/photo.jpg'
-            return [basename($user->photo) => $user->id];
+
+            // ❌ Skip default/shared folders
+            $folder = basename(dirname($user->photo));
+            if ($folder === 'images' || empty($folder)) {
+                return [];
+            }
+
+            return [$folder => $user->id];
         });
         return response()->json($map);
     }
@@ -76,8 +82,6 @@ class AttendanceController extends Controller
      */
     public function markStudentByFace(Request $request): JsonResponse
     {
-        Log:
-        info($request->all());
         $studentId = $request->student_id;
         $sessionDate = $request->session_id;
         $currentTime = now();
@@ -123,8 +127,13 @@ class AttendanceController extends Controller
 
     public function markTeacherByFace(Request $request)
     {
+        Log::info($request->all());
         $teacherId = $request->teacher_id;
-        $teacher = StaffRecord::find($teacherId);
+
+        $teacher = User::where('id', $teacherId)->where('user_type', 'teacher')->first();
+        Log::info($teacher, [$teacherId]);
+
+        Log ::info("Teacher Record: " . ($teacher ? $teacher->toJson() : 'Not Found'));
         if (!$teacher) {
             return response()->json(['message' => 'Teacher not found'], 404);
         }
@@ -201,23 +210,22 @@ class AttendanceController extends Controller
     }
 
     // show teachers Attendance
+    /**
+     * WEB: Display Teacher Attendance Reports
+     */
     public function teacherReport(Request $request)
     {
+        // 1. Initialize variables (Default to today)
         $date = $request->date ?? now()->toDateString();
-        $my_class_id = $request->my_class_id;
-        $section_id = $request->section_id;
+        $status = $request->status;
 
-        $my_classes = $this->my_class->all();
-        $sections = $this->my_class->getAllSections();
+        // 2. Build the query
+        $query = TeachersAttendance::with(['user'])
+            ->whereDate('attendance_date', $date);
 
-        // Determine if a filter has been applied
-        $selected = $request->has('my_class_id');
-        $query = TeachersAttendance::with(['user', 'session'])
-            ->where('attendance_date', $request->date);
-
-        // Apply Class Filter
-        if ($request->my_class_id) {
-            $query->whereRelation('staffRecord', 'my_class_id', $request->my_class_id);
+        // 3. Apply Status Filter if selected
+        if ($status) {
+            $query->where('status', $status);
         }
 
         $attendances = $query->orderBy('time_in', 'desc')->get();
@@ -225,14 +233,9 @@ class AttendanceController extends Controller
         return view('pages.support_team.attendance.teacher_report', compact(
             'attendances',
             'date',
-            'my_classes',
-            'sections',
-            'selected',
-            'my_class_id',
-            'section_id'
+            'status'
         ));
     }
-
     /**
      * TRIGGER 1: Daily Absentee Alert (Run every day at 3:00 PM)
      */
